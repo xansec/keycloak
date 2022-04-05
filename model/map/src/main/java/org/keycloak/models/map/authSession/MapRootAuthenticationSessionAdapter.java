@@ -22,6 +22,7 @@ import org.keycloak.common.util.Time;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.utils.SessionExpiration;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
 import java.util.Collections;
@@ -57,13 +58,13 @@ public class MapRootAuthenticationSessionAdapter extends AbstractRootAuthenticat
     @Override
     public void setTimestamp(int timestamp) {
         entity.setTimestamp(timestamp);
+        entity.setExpiration(SessionExpiration.getAuthSessionExpiration(realm, timestamp));
     }
 
     @Override
     public Map<String, AuthenticationSessionModel> getAuthenticationSessions() {
-        return Optional.ofNullable(entity.getAuthenticationSessions()).orElseGet(Collections::emptyMap).entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                        entry -> new MapAuthenticationSessionAdapter(session, this, entry.getKey(), (MapAuthenticationSessionEntity) entry.getValue())));
+        return Optional.ofNullable(entity.getAuthenticationSessions()).orElseGet(Collections::emptySet).stream()
+                .collect(Collectors.toMap(MapAuthenticationSessionEntity::getTabId, this::toAdapter));
     }
 
     @Override
@@ -72,13 +73,7 @@ public class MapRootAuthenticationSessionAdapter extends AbstractRootAuthenticat
             return null;
         }
 
-        AuthenticationSessionModel authSession = getAuthenticationSessions().get(tabId);
-        if (authSession != null && client.equals(authSession.getClient())) {
-            session.getContext().setAuthenticationSession(authSession);
-            return authSession;
-        } else {
-            return null;
-        }
+        return entity.getAuthenticationSession(tabId).map(this::toAdapter).map(this::setAuthContext).orElse(null);
     }
 
     @Override
@@ -90,16 +85,16 @@ public class MapRootAuthenticationSessionAdapter extends AbstractRootAuthenticat
 
         int timestamp = Time.currentTime();
         authSessionEntity.setTimestamp(timestamp);
+        String tabId = generateTabId();
+        authSessionEntity.setTabId(tabId);
 
-        String tabId =  generateTabId();
-        entity.setAuthenticationSession(tabId, authSessionEntity);
+        entity.addAuthenticationSession(authSessionEntity);
 
         // Update our timestamp when adding new authenticationSession
         entity.setTimestamp(timestamp);
+        entity.setExpiration(SessionExpiration.getAuthSessionExpiration(realm, timestamp));
 
-        MapAuthenticationSessionAdapter authSession = new MapAuthenticationSessionAdapter(session, this, tabId, entity.getAuthenticationSessions().get(tabId));
-        session.getContext().setAuthenticationSession(authSession);
-        return authSession;
+        return entity.getAuthenticationSession(tabId).map(this::toAdapter).map(this::setAuthContext).orElse(null);
     }
 
     @Override
@@ -109,7 +104,9 @@ public class MapRootAuthenticationSessionAdapter extends AbstractRootAuthenticat
             if (entity.getAuthenticationSessions().isEmpty()) {
                 session.authenticationSessions().removeRootAuthenticationSession(realm, this);
             } else {
-                entity.setTimestamp(Time.currentTime());
+                int timestamp = Time.currentTime();
+                entity.setTimestamp(timestamp);
+                entity.setExpiration(SessionExpiration.getAuthSessionExpiration(realm, timestamp));
             }
         }
     }
@@ -117,10 +114,21 @@ public class MapRootAuthenticationSessionAdapter extends AbstractRootAuthenticat
     @Override
     public void restartSession(RealmModel realm) {
         entity.setAuthenticationSessions(null);
-        entity.setTimestamp(Time.currentTime());
+        int timestamp = Time.currentTime();
+        entity.setTimestamp(timestamp);
+        entity.setExpiration(SessionExpiration.getAuthSessionExpiration(realm, timestamp));
     }
 
     private String generateTabId() {
         return Base64Url.encode(SecretGenerator.getInstance().randomBytes(8));
+    }
+
+    private MapAuthenticationSessionAdapter toAdapter(MapAuthenticationSessionEntity entity) {
+        return new MapAuthenticationSessionAdapter(session, this, entity.getTabId(), entity);
+    }
+
+    private MapAuthenticationSessionAdapter setAuthContext(MapAuthenticationSessionAdapter adapter) {
+        session.getContext().setAuthenticationSession(adapter);
+        return adapter;
     }
 }

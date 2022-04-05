@@ -37,6 +37,7 @@ public class Profile {
     public static final String PRODUCT_NAME = ProductValue.RHSSO.getName();
     public static final String PROJECT_NAME = ProductValue.KEYCLOAK.getName();
     private static final Logger logger = Logger.getLogger(Profile.class);
+
     private static Profile CURRENT;
     private final ProductValue product;
     private final ProfileValue profile;
@@ -159,7 +160,7 @@ public class Profile {
         SCRIPTS("Write custom authenticators using JavaScript", Type.PREVIEW),
         TOKEN_EXCHANGE("Token Exchange Service", Type.PREVIEW),
         UPLOAD_SCRIPTS("Ability to upload custom JavaScript through Admin REST API", DEPRECATED),
-        WEB_AUTHN("W3C Web Authentication (WebAuthn)", Type.DEFAULT, Type.PREVIEW),
+        WEB_AUTHN("W3C Web Authentication (WebAuthn)", Type.DEFAULT),
         CLIENT_POLICIES("Client configuration policies", Type.DEFAULT),
         CIBA("OpenID Connect Client Initiated Backchannel Authentication (CIBA)", Type.DEFAULT),
         MAP_STORAGE("New store", Type.EXPERIMENTAL),
@@ -167,7 +168,8 @@ public class Profile {
         DECLARATIVE_USER_PROFILE("Configure user profiles using a declarative style", Type.PREVIEW),
         DYNAMIC_SCOPES("Dynamic OAuth 2.0 scopes", Type.EXPERIMENTAL),
         CLIENT_SECRET_ROTATION("Client Secret Rotation", Type.PREVIEW),
-        STEP_UP_AUTHENTICATION("Step-up Authentication", Type.DEFAULT);
+        STEP_UP_AUTHENTICATION("Step-up Authentication", Type.DEFAULT),
+        RECOVERY_CODES("Recovery codes", Type.PREVIEW);
 
 
         private final Type typeProject;

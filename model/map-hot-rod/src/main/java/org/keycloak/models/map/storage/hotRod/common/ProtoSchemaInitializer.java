@@ -19,10 +19,14 @@ package org.keycloak.models.map.storage.hotRod.common;
 
 import org.infinispan.protostream.GeneratedSchema;
 import org.infinispan.protostream.annotations.AutoProtoSchemaBuilder;
+import org.keycloak.models.map.storage.hotRod.authSession.HotRodAuthenticationSessionEntity;
+import org.keycloak.models.map.storage.hotRod.authSession.HotRodExecutionStatus;
+import org.keycloak.models.map.storage.hotRod.authSession.HotRodRootAuthenticationSessionEntity;
 import org.keycloak.models.map.storage.hotRod.client.HotRodClientEntity;
 import org.keycloak.models.map.storage.hotRod.client.HotRodProtocolMapperEntity;
 import org.keycloak.models.map.storage.hotRod.clientscope.HotRodClientScopeEntity;
 import org.keycloak.models.map.storage.hotRod.group.HotRodGroupEntity;
+import org.keycloak.models.map.storage.hotRod.loginFailure.HotRodUserLoginFailureEntity;
 import org.keycloak.models.map.storage.hotRod.role.HotRodRoleEntity;
 import org.keycloak.models.map.storage.hotRod.user.HotRodUserConsentEntity;
 import org.keycloak.models.map.storage.hotRod.user.HotRodUserCredentialEntity;
@@ -34,6 +38,11 @@ import org.keycloak.models.map.storage.hotRod.user.HotRodUserFederatedIdentityEn
  */
 @AutoProtoSchemaBuilder(
         includeClasses = {
+                // Authentication sessions
+                HotRodRootAuthenticationSessionEntity.class,
+                HotRodAuthenticationSessionEntity.class,
+                HotRodExecutionStatus.class,
+
                 // Clients
                 HotRodClientEntity.class,
                 HotRodProtocolMapperEntity.class,
@@ -52,6 +61,9 @@ import org.keycloak.models.map.storage.hotRod.user.HotRodUserFederatedIdentityEn
                 HotRodUserConsentEntity.class,
                 HotRodUserCredentialEntity.class,
                 HotRodUserFederatedIdentityEntity.class,
+
+                // Login Failures
+                HotRodUserLoginFailureEntity.class,
 
                 // Common
                 HotRodPair.class,
