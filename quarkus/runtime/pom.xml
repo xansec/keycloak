@@ -86,6 +86,7 @@
         <dependency>
             <groupId>org.wildfly.security</groupId>
             <artifactId>wildfly-elytron</artifactId>
+            <version>${wildfly-elytron.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.vault</groupId>
@@ -284,6 +285,16 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-cbor</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kerby</groupId>
+            <artifactId>kerby-asn1</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
