@@ -23,4 +23,5 @@ public interface Constants {
     public static final Integer CURRENT_SCHEMA_VERSION_GROUP = 1;
     public static final Integer CURRENT_SCHEMA_VERSION_REALM = 1;
     public static final Integer CURRENT_SCHEMA_VERSION_ROLE = 1;
+    public static final Integer CURRENT_SCHEMA_VERSION_USER_LOGIN_FAILURE = 1;
 }
